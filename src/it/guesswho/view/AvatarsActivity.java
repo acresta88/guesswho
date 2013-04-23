@@ -1,5 +1,6 @@
 package it.guesswho.view;
 
+import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
 
@@ -26,8 +27,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.example.guesswho.R;
 
 @SuppressLint("NewApi")
 public class AvatarsActivity extends Activity {
@@ -172,4 +171,6 @@ public class AvatarsActivity extends Activity {
 	        return null;
 	    }
 	}
+	
+	
 }

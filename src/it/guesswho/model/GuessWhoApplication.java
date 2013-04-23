@@ -3,9 +3,11 @@ package it.guesswho.model;
 import java.util.ArrayList;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.facebook.Session;
 import com.facebook.model.GraphUser;
+import com.google.android.gcm.GCMRegistrar;
 
 public class GuessWhoApplication extends Application{
 	private ArrayList<User> cellUsers;

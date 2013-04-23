@@ -1,5 +1,6 @@
 package it.guesswho.view;
 
+import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
 
@@ -18,7 +19,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.example.guesswho.R;
 import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Request.Callback;
