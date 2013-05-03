@@ -49,6 +49,13 @@
                 android:text="New Game" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/sendMsgButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="sendMsg" />
+
     </LinearLayout>
     <FrameLayout
             android:id="@+id/fragment_container"

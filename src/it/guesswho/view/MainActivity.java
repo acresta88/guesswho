@@ -2,16 +2,16 @@ package it.guesswho.view;
 
 
 import it.guesswho.R;
+import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.utils.GUIUtils;
-import it.guesswho.utils.HttpConnector;
 import it.guesswho.utils.NetworkUtils;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,7 +23,6 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.ProfilePictureView;
-import com.google.android.gcm.GCMRegistrar;
 
 /**
  * MainActivity of the application, it's used for the login method and for starting the game
@@ -32,7 +31,7 @@ import com.google.android.gcm.GCMRegistrar;
  */
 public class MainActivity extends FragmentActivity {
 
-	private String tag = "GCMIntentService";
+	private String tagLogin = "login";
 	private String tagSession = "session";
 	
     private Button newGameButton;	
@@ -41,8 +40,9 @@ public class MainActivity extends FragmentActivity {
     private TextView greeting;
     private UiLifecycleHelper uiHelper;
 	private GuessWhoApplication application;
-
-    /**
+	private ControllerGCM controller;
+    
+	/**
      * Definition for the callback of the status' changes 
      */
     private Session.StatusCallback sessionCallback = new Session.StatusCallback() {
@@ -56,11 +56,12 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
-        
+
         setContentView(R.layout.activity_main);
 
         if(NetworkUtils.isConnected(this))
         {
+        	controller = new ControllerGCM(this);
         	application = (GuessWhoApplication) getApplication();
             
             uiHelper = new UiLifecycleHelper(this, sessionCallback);
@@ -71,6 +72,7 @@ public class MainActivity extends FragmentActivity {
 	            @Override
 	            public void onUserInfoFetched(GraphUser user) {
 	                application.setUser(user);
+	                controller.enableGCM();
 	                updateUI();
 	                // It's possible that we were waiting for this.user to be populated in order to post a
 	                // status update.
@@ -88,24 +90,16 @@ public class MainActivity extends FragmentActivity {
 	            }
 	        });
 	        
+	        Button newMessageButton = (Button) findViewById(R.id.sendMsgButton);
+	        newMessageButton.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					Log.d("GCMService", "onClickSendMessage " + application.getGcmId());
+					controller.sendGCMMessage(application.getGcmId(), application.getGcmId(), "send messaggio di prova");
+				}
+			});
 	        autoLogin(savedInstanceState);
-	        
-	       
-	        /* abilitare GCM */
-	        GCMRegistrar.checkManifest(this);
-
-	        GCMRegistrar.checkDevice(this);
-	        GCMRegistrar.checkManifest(this);
-	        String regId = GCMRegistrar.getRegistrationId(this);
-	        Log.d(tag, "getReg.Id:" + regId);
-	        if (regId.equals("")) {
-	          GCMRegistrar.register(this, "830091449019");
-	          regId = GCMRegistrar.getRegistrationId(this);
-	        } else {
-	          Log.d(tag, "Already registered");
-	        }
-	        
-	        HttpConnector.postMessage("gcm/create/" + regId, "");
         }
         else
         {
@@ -188,7 +182,7 @@ public class MainActivity extends FragmentActivity {
     private void updateUI() {
         Session session = Session.getActiveSession();
         boolean enableButtons = (session != null && session.isOpened());
-        Log.d("autologin", "session active?" + enableButtons + " exp date:" + session.getExpirationDate().toString() + " permissions:" + session.getPermissions().toString());
+        Log.d(tagLogin, "session active?" + enableButtons + " exp date:" + session.getExpirationDate().toString() + " permissions:" + session.getPermissions().toString());
 
         if (enableButtons && application.getUser() != null) {
         	application.setSession(session);
@@ -202,18 +196,19 @@ public class MainActivity extends FragmentActivity {
 
 	private void autoLogin(Bundle savedInstanceState){
 		
-		Log.d("autologin", "start autologin");
+		Log.d(tagLogin, "start autologin");
 		// check previous user saved
 		Session session = Session.getActiveSession();
         if (session == null && savedInstanceState != null) {
-            	Log.d("autologin", "restore session");
+            	Log.d(tagLogin, "restore session");
                 session = Session.restoreSession(this, null, sessionCallback, savedInstanceState);
-                Log.d("autologin", "session " + session.getAccessToken());
+                Log.d(tagLogin, "session " + session.getAccessToken());
         }
 	    if (session == null || !session.isOpened())
         {
+			Log.d(tagLogin, "secondo if");
+
 	    	application.setSession(session);
-	        Log.d("autologin", "else");
 			// start Facebook Login
 			Session.openActiveSession(this, true, new Session.StatusCallback() {
 		
@@ -226,27 +221,33 @@ public class MainActivity extends FragmentActivity {
 						// saving the session
 //						Session.saveSession(session, null);
 							
-						Log.d("autologin", session.toString());
+						Log.d(tagLogin, "sessione aperta richiedo utente");
 						// make request to the /me API
-						Request.executeMeRequestAsync(session,
-								new Request.GraphUserCallback() {
+						Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
 												// callback after Graph API response with user
 									// object
 									@Override
 									public void onCompleted(GraphUser newuser,
 											Response response) {
+										Log.d(tagLogin, "onCompleted callback me");
+
 										if (newuser != null) {
-											Log.d("autologin", newuser.toString());
+											Log.d(tagLogin, newuser.toString());
 											application.setUser(newuser);
+							                controller.enableGCM();
+
 										}
 									}
 								});
 					}
+					else
+						Log.d(tagLogin, "sessione non aperta");
 					}
 				});
 	    }	
-        
+
         updateUI();
 	}
+	
 	
 }

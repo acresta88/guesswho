@@ -1,15 +1,15 @@
 package it.guesswho;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import it.guesswho.utils.StaticVariables;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentService{
 
-	private String tag = "GCMIntentService";
+	private String tag = "GCMService";
 	public GCMIntentService() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -42,7 +42,7 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 		 *  unless this method is overridden and returns false. This method is optional and 
 		 *  should be overridden only if you want to display the message to the user or cancel 
 		 *  the retry attempts.
-		 *  */
+		 *  */ 
 		Log.d(tag, "error:" + errorId.toString());
 
 		return super.onRecoverableError(context, errorId);
@@ -55,20 +55,55 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 		 * as extras in the intent. 
 		*/
 		
+		
 		Log.d(tag, "onMessage:" + arg1.toString());
 
 		String message = arg1.getExtras().getString("content").toString();
-
-		Log.d(tag, "bundle message:" + message);
-
-		generateNotification(arg0, message);
-
+		Log.d(tag, "answer:" + message);
+		Log.d(tag, "title:" + arg1.getExtras().getString("title"));
+		if(arg1.getExtras().getString("title") != null)
+		{
+			if(arg1.getExtras().getString("title").equals("game.create"))
+			{
+				generateNotification(arg0, arg1.getExtras());
+			}
+		}
 	}
+	
 
-	private void generateNotification(Context arg0, String message) {
+	@SuppressLint("NewApi")
+	private void generateNotification(Context context, Bundle message) {
+		Log.d(tag, "generating notification for:" + message);
+
+		Intent intent = new Intent();
+		intent.setAction(StaticVariables.actionCreateGame);
+		intent.putExtras(message);
+		sendBroadcast(intent);
+//		Log.d(tag, "send broadcast:" + message);
+
+		/*
+		//Get the Notification Service
+		NotificationManager notifier = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+	
+		Notification notification = new Notification(R.drawable.icon,"Simple Notification",System.currentTimeMillis());
+
+		//Setup the Intent to open this Activity when clicked
+		Intent toLaunch = new Intent(getApplicationContext(),MainActivity.class);
+		PendingIntent contentIntent =
+		PendingIntent.getActivity(getApplicationContext(), 0, toLaunch, 0);
 		
+		//Set the Notification Info
+		notification.setLatestEventInfo(getApplicationContext(), "Hi!!", "This is a simple notification", contentIntent);
+		
+		//Setting Notification Flags
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notification.flags |= Notification.DEFAULT_SOUND;
+		
+		//Send the notification
+		notifier.notify(0x007, notification);
+		*/
 	}
-
+	
 	@Override
 	protected void onRegistered(Context arg0, String arg1) {
 		/* TODO  Called after a registration intent is received, passes the 

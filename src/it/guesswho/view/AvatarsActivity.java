@@ -121,7 +121,7 @@ public class AvatarsActivity extends Activity {
 	    	else{
 	    		grid = (View)convertView;		   
 	    	}
-		    
+		     
 	    	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
 	    	if(images[position] == null)
 	    	{

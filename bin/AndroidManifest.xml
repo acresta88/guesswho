@@ -65,5 +65,11 @@
 		    <category android:name="it.guesswho" />
 		  </intent-filter>
 		</receiver>
+		<!-- 
+		<receiver android:name=".mIntentReceiver" >  
+			<intent-filter >  
+        		<action android:name="game.create"/>  
+    		</intent-filter>  
+		</receiver>  -->
 	 </application>
 </manifest>
