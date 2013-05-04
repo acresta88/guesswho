@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -25,7 +24,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.facebook.HttpMethod;
 import com.facebook.Request;
@@ -72,7 +70,6 @@ public class FriendPicker extends Activity {
 				}
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 	    	
@@ -129,44 +126,38 @@ public class FriendPicker extends Activity {
 	 */
 	private void onClickNewGame(String opponent) {
     	Log.d(tag, "onClickNewGame");
-		/* message to the server for creating the match */
-		NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), opponent, application.getSession().getAccessToken());
-		
 		
 		/* retrieving mutual friends */
-//    	Bundle b = new Bundle();
-//    	b.putString("user", opponent);
-//
-//    	Request r = new Request(application.getSession(), "me/mutualfriends", b, HttpMethod.GET, new Callback() {
-//			
-//        	int maxAvatars = 150;
-//
-//        	@Override
-//			public void onCompleted(Response response) {
-//				try {
-//					Log.d("session", response.toString());
-//					JSONArray jsonArray = response.getGraphObject().getInnerJSONObject().getJSONArray("data");
-//
-//			    	ArrayList<User> users = new ArrayList<User>();
-//			    	Log.d("mutualfriends", "numero" + jsonArray.length());
-//					for (int i = 0; i < jsonArray.length(); i++)
-//					{
-//						Log.d("mutualfriends", jsonArray.getString(i));
-//						if (i < maxAvatars)
-//							users.add(new User(jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("id")));
-//						else
-//							break;
-//					}
-//					//start avatars activity
-//			    	startAvatarsActivity(users);
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				} catch (NullPointerException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//    	r.executeAsync();
+    	final Bundle b = new Bundle();
+    	b.putString("user", opponent);
+
+    	Request r = new Request(application.getSession(), "me/mutualfriends", b, HttpMethod.GET, new Callback() {
+			
+        	@Override
+			public void onCompleted(Response response) {
+				try {
+					Log.d(tag, response.toString());
+					JSONArray jsonArray = response.getGraphObject().getInnerJSONObject().getJSONArray("data");
+
+			    	ArrayList<User> users = new ArrayList<User>();
+			    	Log.d(tag, "numero" + jsonArray.length());
+					for (int i = 0; i < jsonArray.length(); i++)
+					{
+						Log.d(tag, jsonArray.getString(i));
+						users.add(new User(jsonArray.getJSONObject(i).getString("name"), jsonArray.getJSONObject(i).getString("id")));
+					}
+
+					/* message to the server for creating the match */
+					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), b.getString("user"), users);
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+    	r.executeAsync();
     }
 
 	private void startAvatarsActivity(ArrayList<User> users) {

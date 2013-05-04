@@ -1,5 +1,10 @@
 package it.guesswho.utils;
 
+import it.guesswho.model.User;
+
+import java.util.ArrayList;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,12 +50,17 @@ public class NetworkUtils {
         HttpConnector.postMessage("gcm/create/", json.toString());
 	}
 
-	public static void createMatch(String gcmId, String facebookId, String opponentId, String token)
+	public static void createMatch(String gcmId, String facebookId, String opponentId, ArrayList<User> users)
 	{
 		JSONObject json = new JSONObject();
-        
+		
+		JSONArray array=new JSONArray();
+	    for (int i = 0; i < users.size(); i++) {
+	        array.put(users.get(i).getId());
+
+	    }
         try {
-        	json.put("access_token", token);
+        	json.put("users",array);
 			json.put("gcmId", gcmId);
 			json.put("fbId", facebookId);
 	        json.put("opponentFbId", opponentId);
