@@ -27,8 +27,8 @@ import android.util.Log;
 public class HttpConnector {
 	
 	private static String tag = "http";
-//	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
-	private static String HOSTNAME = "http://192.168.1.64:5000/";
+	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
+//	private static String HOSTNAME = "http://192.168.1.64:5000/";
 //	private static String HOSTNAME = "http://192.168.1.100:5000/";
 //	private static String HOSTNAME = "http://192.168.165.245:5000/";
 
@@ -37,7 +37,7 @@ public class HttpConnector {
 	 * @param url
 	 * @return
 	 */
-	public static HttpResponse getMessage(String url)
+	public static HttpResponse getMessage(String url, String jsonMessage)
 	{
 		url = HOSTNAME + url;
 		
@@ -48,10 +48,8 @@ public class HttpConnector {
 		    HttpGet get = new HttpGet(url);
 		    HttpResponse responseGet = client.execute(get);  
 		    response = responseGet;
-		    Log.i(tag,"Post ll"+response.getEntity().getContentLength());
 		    
 		} catch (Exception e) {
-			
 			 Log.i(tag, e.toString());
 		}
 		
@@ -122,7 +120,7 @@ public static HttpResponse postMessage(String url,String jsonMessage) {
 			response = client.execute(put);
 			if(response != null)
 			{
-				Log.d(tag, "response:" + EntityUtils.toString(response.getEntity()));
+//				Log.d(tag, "response:" + EntityUtils.toString(response.getEntity()));
 			}
 			else
 			{

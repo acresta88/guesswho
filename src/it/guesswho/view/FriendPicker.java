@@ -115,7 +115,7 @@ public class FriendPicker extends Activity {
 
 	 	    @Override
 	 	    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-	 	    	onClickNewGame(users.get(position).getId());
+	 	    	onClickNewGame(users.get(position).getName(), users.get(position).getId());
 	 	    }
 
  	    });
@@ -124,14 +124,15 @@ public class FriendPicker extends Activity {
 	/**
 	 * da muovere in avatar activity
 	 */
-	private void onClickNewGame(String opponent) {
+	private void onClickNewGame(String opponentName, String opponentId) {
     	Log.d(tag, "onClickNewGame");
 		
 		/* retrieving mutual friends */
     	final Bundle b = new Bundle();
-    	b.putString("user", opponent);
+    	b.putString("userName", opponentName);
+    	b.putString("userId", opponentId);
 
-    	Request r = new Request(application.getSession(), "me/mutualfriends", b, HttpMethod.GET, new Callback() {
+    	Request r = new Request(application.getSession(), opponentId+"/mutualfriends", b, HttpMethod.GET, new Callback() {
 			
         	@Override
 			public void onCompleted(Response response) {
@@ -148,7 +149,7 @@ public class FriendPicker extends Activity {
 					}
 
 					/* message to the server for creating the match */
-					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), b.getString("user"), users);
+					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), b.getString("userId"), b.getString("userName"), users);
 
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -161,7 +162,7 @@ public class FriendPicker extends Activity {
     }
 
 	private void startAvatarsActivity(ArrayList<User> users) {
-		Intent i = new Intent(this, AvatarsActivity.class);
+		Intent i = new Intent(this, GameActivity.class);
 		application.setCellUsers(users);
 		
 		if(users != null && users.size() > 0)

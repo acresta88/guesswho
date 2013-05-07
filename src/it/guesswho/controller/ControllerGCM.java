@@ -38,7 +38,7 @@ public class ControllerGCM {
         if(!registeredToTheServer)
         {
         	Log.d(tag, "not registered to the server, regitering now!");
-        	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId());
+        	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId(), application.getUser().getName());
         	registeredToTheServer = true;
         }
         else

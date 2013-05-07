@@ -1,6 +1,8 @@
 package it.guesswho.view;
 
 
+import java.util.ArrayList;
+
 import it.guesswho.R;
 import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
@@ -34,6 +36,7 @@ public class MainActivity extends FragmentActivity {
 	private String tagLogin = "login";
 	private String tagSession = "session";
 	
+    private Button searchGameButton;	
     private Button newGameButton;	
     private LoginButton loginButton;
     private ProfilePictureView profilePictureView;
@@ -87,6 +90,19 @@ public class MainActivity extends FragmentActivity {
 	            public void onClick(View view) {
 	            	Intent i = new Intent(application.getApplicationContext(), FriendPicker.class);
 	            	startActivity(i);
+	            }
+	        });
+	        
+	        searchGameButton = (Button) findViewById(R.id.searchGameButton);
+	        searchGameButton.setOnClickListener(new View.OnClickListener() {
+	            public void onClick(View view) {
+	            	Log.d("http", "search request "+ application.getGcmId() +" - "+ application.getUser().getId());
+	            	ArrayList<String> users = NetworkUtils.searchMatches(application.getGcmId(), application.getUser().getId());
+	            	//create an appropriate activity
+	            	Intent i = new Intent(application.getApplicationContext(), SearchMatchActivity.class);
+	            	i.putStringArrayListExtra("users", users);
+	            	startActivity(i);
+	            	
 	            }
 	        });
 	        

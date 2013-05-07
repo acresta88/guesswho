@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:textColor="#333333"
     android:textSize="28dp"
-    android:height="40px"
+    android:height="48px"
 />

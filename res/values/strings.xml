@@ -14,7 +14,7 @@
     <string name="hello_world">Hello world!</string>
 
     <!-- Facebook strings -->
-    <string name="app_name">HelloFacebookSample</string>
+    <string name="app_name">GuessWho</string>
     <string name="cancelled">Cancelled</string>
     <string name="permission_not_granted">Unable to perform selected action because permissions were not granted.</string>
     <string name="ok">OK</string>
@@ -30,5 +30,10 @@
     <string name="pick_seattle_place">Pick a Seattle Place</string>
     <string name="exception">Exception: %1$s</string>
     <string name="title_activity_challenges">ChallengesActivity</string>
+    <string name="title_activity_search_match">SearchMatchActivity</string>
+    <string name="title_activity_game">GameActivity</string>
 
+    <!-- Game Activity strings -->
+    <string name="title_section1">Game Court</string>
+    <string name="title_section2">Messages history</string>
 </resources>

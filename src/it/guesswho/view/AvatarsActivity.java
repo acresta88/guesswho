@@ -50,7 +50,7 @@ public class AvatarsActivity extends Activity {
 	    gridview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 	        	//TODO logica quando clicco
-	            Toast.makeText(AvatarsActivity.this, "" + position, Toast.LENGTH_SHORT).show();
+//	            Toast.makeText(AvatarsActivity.this, "" + position, Toast.LENGTH_SHORT).show();
 
 	            if(visualizedUsers[position])
 	            {

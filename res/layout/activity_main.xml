@@ -47,14 +47,19 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="New Game" />
-
+			<Button
+	            android:id="@+id/sendMsgButton"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="sendMsg" />
+			<Button
+	            android:id="@+id/searchGameButton"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="Search Game" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/sendMsgButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="sendMsg" />
+        
 
     </LinearLayout>
     <FrameLayout

@@ -7,20 +7,23 @@
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="17" />
-	
-	<permission android:name="it.guesswho.permission.C2D_MESSAGE" android:protectionLevel="signature" />
-	<uses-permission android:name="it.guesswho.permission.C2D_MESSAGE" /> 
+
+    <permission
+        android:name="it.guesswho.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="it.guesswho.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- App receives GCM messages. -->
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-	<!-- GCM connects to Google Services. -->
-	<uses-permission android:name="android.permission.INTERNET" /> 
-	<!-- GCM requires a Google account. -->
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-	<!-- Keeps the processor from sleeping when a message is received. -->
-	<uses-permission android:name="android.permission.WAKE_LOCK" />
-	<!-- <uses-permission android:name="com.google.android.c2dm.permission.SEND"/> -->
-	
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <!-- GCM connects to Google Services. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- GCM requires a Google account. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!-- Keeps the processor from sleeping when a message is received. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- <uses-permission android:name="com.google.android.c2dm.permission.SEND"/> -->
+
     <application
         android:name="it.guesswho.model.GuessWhoApplication"
         android:allowBackup="true"
@@ -36,9 +39,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-		
-		<service android:name=".GCMIntentService" />
-        
+
+        <service android:name="it.guesswho.GCMIntentService" />
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/app_id" />
@@ -57,19 +60,28 @@
             android:name="it.guesswho.view.ChallengesActivity"
             android:label="@string/title_activity_challenges" >
         </activity>
-   
-		<receiver android:name="com.google.android.gcm.GCMBroadcastReceiver" android:permission="com.google.android.c2dm.permission.SEND" >
-		  <intent-filter>
-		    <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-		    <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
-		    <category android:name="it.guesswho" />
-		  </intent-filter>
-		</receiver>
-		<!-- 
-		<receiver android:name=".mIntentReceiver" >  
-			<intent-filter >  
-        		<action android:name="game.create"/>  
-    		</intent-filter>  
-		</receiver>  -->
-	 </application>
+
+        <receiver
+            android:name="com.google.android.gcm.GCMBroadcastReceiver"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+
+                <category android:name="it.guesswho" />
+            </intent-filter>
+        </receiver>
+       
+        <activity
+            android:name="it.guesswho.view.SearchMatchActivity"
+            android:label="@string/title_activity_search_match" >
+        </activity>
+        
+        <activity
+            android:name="it.guesswho.view.GameActivity"
+            android:label="@string/title_activity_game" 
+			android:theme="@style/Theme.Sherlock">
+        </activity>
+    </application>
+
 </manifest>

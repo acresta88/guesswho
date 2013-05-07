@@ -11,6 +11,7 @@ import org.json.JSONException;
 
 import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.HttpMethod;
 import com.facebook.Request;
@@ -59,6 +60,9 @@ public class ControllerFB {
 						//signal to the activity
 						((FriendPicker)activity).setList(); //TODO to modify with a better way to notify
 					} catch (JSONException e) {
+						e.printStackTrace();
+					} catch (NullPointerException e) {
+						Toast.makeText(activity.getApplicationContext(), "problem occorred during the facebook request", Toast.LENGTH_LONG).show();
 						e.printStackTrace();
 					}
 				}
