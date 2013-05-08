@@ -65,43 +65,24 @@ public class GCMIntentService extends com.google.android.gcm.GCMBaseIntentServic
 		{
 			if(arg1.getExtras().getString("title").equals("game.create"))
 			{
-				generateNotification(arg0, arg1.getExtras());
+				generateNotification(arg0, arg1.getExtras(), StaticVariables.actionCreateGame);
+			}
+			if(arg1.getExtras().getString("title").equals("gcm.msg"))
+			{
+				generateNotification(arg0, arg1.getExtras(), StaticVariables.actionReceivedMessage);
 			}
 		}
 	}
 	
 
 	@SuppressLint("NewApi")
-	private void generateNotification(Context context, Bundle message) {
+	private void generateNotification(Context context, Bundle message, String action) {
 		Log.d(tag, "generating notification for:" + message);
 
 		Intent intent = new Intent();
-		intent.setAction(StaticVariables.actionCreateGame);
+		intent.setAction(action);
 		intent.putExtras(message);
 		sendBroadcast(intent);
-//		Log.d(tag, "send broadcast:" + message);
-
-		/*
-		//Get the Notification Service
-		NotificationManager notifier = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-	
-		Notification notification = new Notification(R.drawable.icon,"Simple Notification",System.currentTimeMillis());
-
-		//Setup the Intent to open this Activity when clicked
-		Intent toLaunch = new Intent(getApplicationContext(),MainActivity.class);
-		PendingIntent contentIntent =
-		PendingIntent.getActivity(getApplicationContext(), 0, toLaunch, 0);
-		
-		//Set the Notification Info
-		notification.setLatestEventInfo(getApplicationContext(), "Hi!!", "This is a simple notification", contentIntent);
-		
-		//Setting Notification Flags
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-		notification.flags |= Notification.DEFAULT_SOUND;
-		
-		//Send the notification
-		notifier.notify(0x007, notification);
-		*/
 	}
 	
 	@Override

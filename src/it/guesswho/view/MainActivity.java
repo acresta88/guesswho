@@ -1,19 +1,19 @@
 package it.guesswho.view;
 
 
-import java.util.ArrayList;
-
 import it.guesswho.R;
 import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.utils.GUIUtils;
 import it.guesswho.utils.NetworkUtils;
+
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -34,7 +34,7 @@ import com.facebook.widget.ProfilePictureView;
 public class MainActivity extends FragmentActivity {
 
 	private String tagLogin = "login";
-	private String tagSession = "session";
+	private String tagSession = "login";
 	
     private Button searchGameButton;	
     private Button newGameButton;	
@@ -74,6 +74,9 @@ public class MainActivity extends FragmentActivity {
 	        loginButton.setUserInfoChangedCallback(new LoginButton.UserInfoChangedCallback() {
 	            @Override
 	            public void onUserInfoFetched(GraphUser user) {
+	            	Log.d(tagSession, "onUserInfoFetched");
+	            	Log.d(tagSession, "user:"+user);
+
 	                application.setUser(user);
 	                controller.enableGCM();
 	                updateUI();
@@ -105,16 +108,7 @@ public class MainActivity extends FragmentActivity {
 	            	
 	            }
 	        });
-	        
-	        Button newMessageButton = (Button) findViewById(R.id.sendMsgButton);
-	        newMessageButton.setOnClickListener(new OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					Log.d("GCMService", "onClickSendMessage " + application.getGcmId());
-					controller.sendGCMMessage(application.getGcmId(), application.getGcmId(), "send messaggio di prova");
-				}
-			});
+	         
 	        autoLogin(savedInstanceState);
         }
         else

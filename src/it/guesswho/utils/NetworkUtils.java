@@ -3,6 +3,10 @@ package it.guesswho.utils;
 import it.guesswho.model.User;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.apache.http.HttpRequest;
@@ -14,6 +18,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
@@ -28,11 +34,12 @@ public class NetworkUtils {
 	}
 	
 	
-	public static void sendGCMMessage(String senderId, String receiverId, String message)
+	public static void sendGCMMessage(String senderId, String receiverId, String message, String answer)
 	{
 		JSONObject json = new JSONObject();
          
         try {
+			json.put("answer", answer);
 			json.put("text", message);
 			json.put("sender", senderId);
 	        json.put("receiver", receiverId);
@@ -112,4 +119,37 @@ public class NetworkUtils {
 
 	}
 
+	public static String getUrlFacebookUserAvatar(String name_or_idUser )
+	{
+		String address = "http://graph.facebook.com/"+name_or_idUser+"/picture?type=normal";
+	    URL url;
+	    String newLocation = null;
+	    try {
+	        url = new URL(address);
+	        HttpURLConnection.setFollowRedirects(false); //Do _not_ follow redirects!
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        newLocation = connection.getHeaderField("Location");
+	    } catch (MalformedURLException e) {
+	        e.printStackTrace();
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+
+	    return newLocation;
+	}
+	
+	public static Bitmap getBitmapFromURL(String src) {
+	    try {
+	        URL url = new URL(src);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoInput(true);
+	        connection.connect();
+	        InputStream input = connection.getInputStream();
+	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
+	        return myBitmap;
+	    } catch (IOException e) {   
+	        e.printStackTrace();
+	        return null;
+	    }
+	}
 }

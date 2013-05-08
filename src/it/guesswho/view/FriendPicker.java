@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.HttpMethod;
 import com.facebook.Request;
@@ -40,52 +41,52 @@ public class FriendPicker extends Activity {
 	
 	private String tag = "friendpicker";
 	
-	private IntentFilter mIntentFilter;
-	private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
-	    @Override
-	    public void onReceive(Context context, Intent intent) {
-	    	Log.d("GCMService", intent.getExtras().getString("content"));
-
-	    	ArrayList<User> newusers = new ArrayList<User>();
-	    	JSONArray jsonArray;
-			try {
-				jsonArray = new JSONArray(intent.getExtras().getString("content"));
-				for (int i = 0; i < jsonArray.length(); i++)
-		    	{
-					Log.d(tag, jsonArray.getString(i));
-					
-					if (i < 15)
-					{
-						for(int j = 0; j < users.size(); j++)
-						{
-							if(users.get(j).getId().equals(jsonArray.getString(i)))
-							{
-								newusers.add(new User(users.get(j).getName(), jsonArray.getString(i)));
-								break;
-							}
-						}
-					}
-					else
-						break;
-				}
-
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-	    	
-	    	startAvatarsActivity(newusers);
-
-	    }
-	};
+//	private IntentFilter mIntentFilter;
+//	private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+//	    @Override
+//	    public void onReceive(Context context, Intent intent) {
+//	    	Log.d("GCMService", intent.getExtras().getString("content"));
+//
+//	    	ArrayList<User> newusers = new ArrayList<User>();
+//	    	JSONArray jsonArray;
+//			try {
+//				jsonArray = new JSONArray(intent.getExtras().getString("content"));
+//				for (int i = 0; i < jsonArray.length(); i++)
+//		    	{
+//					Log.d(tag, jsonArray.getString(i));
+//					
+//					if (i < 15)
+//					{
+//						for(int j = 0; j < users.size(); j++)
+//						{
+//							if(users.get(j).getId().equals(jsonArray.getString(i)))
+//							{
+//								newusers.add(new User(users.get(j).getName(), jsonArray.getString(i)));
+//								break;
+//							}
+//						}
+//					}
+//					else
+//						break;
+//				}
+//
+//			} catch (JSONException e) {
+//				e.printStackTrace();
+//			}
+//	    	
+//	    	startAvatarsActivity(newusers);
+//
+//	    }
+//	};
 
     @Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_friendpicker);
  
-	    mIntentFilter = new IntentFilter();
-	    mIntentFilter.addAction(StaticVariables.actionCreateGame);
-        registerReceiver(mIntentReceiver, mIntentFilter);
+//	    mIntentFilter = new IntentFilter();
+//	    mIntentFilter.addAction(StaticVariables.actionCreateGame);
+//        registerReceiver(mIntentReceiver, mIntentFilter);
 
 	    listView = (ListView) findViewById(R.id.listview);
 
@@ -150,10 +151,12 @@ public class FriendPicker extends Activity {
 
 					/* message to the server for creating the match */
 					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), b.getString("userId"), b.getString("userName"), users);
-
+					application.clearImages();
+					startAvatarsActivity();
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (NullPointerException e) {
+					Toast.makeText(getApplicationContext(), "error with the connection, try again", Toast.LENGTH_SHORT).show();
 					e.printStackTrace();
 				}
 			}
@@ -161,14 +164,19 @@ public class FriendPicker extends Activity {
     	r.executeAsync();
     }
 
-	private void startAvatarsActivity(ArrayList<User> users) {
+//	private void startAvatarsActivity(ArrayList<User> users) {
+//		Intent i = new Intent(this, GameActivity.class);
+//		application.setCellUsers(users);
+//		
+//		if(users != null && users.size() > 0)
+//			startActivity(i);
+//		else
+//			showAlert("error", "no mutual friends");
+//	}
+
+	private void startAvatarsActivity() {
 		Intent i = new Intent(this, GameActivity.class);
-		application.setCellUsers(users);
-		
-		if(users != null && users.size() > 0)
-			startActivity(i);
-		else
-			showAlert("error", "no mutual friends");
+		startActivity(i);
 	}
 	
 	private void showAlert(String title, String message) {

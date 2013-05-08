@@ -2,13 +2,28 @@ package it.guesswho.view;
 
 
 import it.guesswho.R;
+import it.guesswho.model.GuessWhoApplication;
+import it.guesswho.model.User;
+import it.guesswho.utils.StaticVariables;
+
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
@@ -27,17 +42,103 @@ public class GameActivity extends SherlockFragmentActivity {
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
 	public SectionsPagerAdapter mSectionsPagerAdapter;
-
+	public Fragment[] fragments;
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+
+	private GuessWhoApplication application;
+	private String tag = "GameActivity";
+	private IntentFilter mIntentFilter;
+	private BroadcastReceiver mIntentReceiver = new BroadcastReceiver() {
+	    @Override
+	    public void onReceive(Context context, Intent intent) {
+	    	String action = intent.getAction();
+    		Log.d(tag, "action = " + action);
+
+	    	if(action.equals(StaticVariables.actionReceivedMessage))
+	    	{
+	    		Log.d(tag, "received message");
+	    		String message = intent.getExtras().getString("content");
+		    	String answer = intent.getExtras().getString("answer");
+		    	
+		    	Log.d("GCMService", "broadcast receiver:" + message);
+		    	if(answer == null || answer.equals(""))
+		    		((GameMessagesFragment) mSectionsPagerAdapter.getItem(1)).addInList(message);
+		    	else
+		    	{
+		    		((GameMessagesFragment) mSectionsPagerAdapter.getItem(1)).setAnswer(message, answer);
+		    	}
+		    	
+		    	Toast.makeText(getApplicationContext(), "Received message check in the fragment!", Toast.LENGTH_SHORT).show();
+	    	}
+	    	if(action.equals(StaticVariables.actionCreateGame))
+	    	{
+	    		Log.d(tag, "action create game");
+	    		ArrayList<User> users = application.getFriendList();
+
+	    		ArrayList<User> newusers = new ArrayList<User>();
+		    	JSONArray jsonArray;
+				try {
+					jsonArray = new JSONArray(intent.getExtras().getString("content"));
+					for (int i = 0; i < jsonArray.length(); i++)
+			    	{
+						Log.d(tag, jsonArray.getString(i));
+						
+						if (i < 30)
+						{
+							for(int j = 0; j < users.size(); j++)
+							{
+								if(users.get(j).getId().equals(jsonArray.getString(i)))
+								{
+									newusers.add(new User(users.get(j).getName(), jsonArray.getString(i)));
+									break;
+								}
+							}
+						}
+						else
+							break;
+					}
+	
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				application.setCellUsers(newusers);
+
+				application.setImages(new Bitmap[users.size()]);
+				PrefetchingTask task = new PrefetchingTask(application);
+			    task.execute();
+
+				setFragmentGui();
+				
+	    	}
+	    }
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_game);
 
+		application = (GuessWhoApplication) getApplication();
+		application.setGameActivity(this);
+		mIntentFilter = new IntentFilter();
+	    mIntentFilter.addAction(StaticVariables.actionReceivedMessage);
+	    mIntentFilter.addAction(StaticVariables.actionCreateGame);//remove
+        registerReceiver(mIntentReceiver, mIntentFilter);
+
+	}
+
+	private void setFragmentGui()
+	{
+		Log.d(tag, "setting gui");
+		
+		fragments = new Fragment[3];
+		fragments[0] = new GameFragment();
+		fragments[1] = new GameMessagesFragment();
+		fragments[2] = new GameSendMessageFragment();
+		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		
@@ -56,7 +157,7 @@ public class GameActivity extends SherlockFragmentActivity {
 		// a reference to the Tab.
 		
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
         //Used to put dark icons on light action bar
@@ -100,21 +201,16 @@ public class GameActivity extends SherlockFragmentActivity {
 			
 			Fragment fragment = null;
 			
-			if(position == 0){
-				fragment = new GameFragment();
-				
+			if(position < getCount()){
+				fragment = fragments[position];
 			}
-			if(position == 1){
-				fragment = new GameMessagesFragment();
-			}
-			
 			return fragment;
 		}
 		
 		@Override
 		public int getCount() {
 			// Show 3 total pages.
-			return 2;
+			return fragments.length;
 		}
 
 		@Override
@@ -124,6 +220,8 @@ public class GameActivity extends SherlockFragmentActivity {
 				return "Game Court";
 			case 1:
 				return "Message history ";
+			case 2:
+				return "Send message ";
 			}
 			return "No fragment";
 		}
@@ -154,6 +252,7 @@ public class GameActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onStop() {
+		unregisterReceiver(mIntentReceiver);
 		super.onStop();
 	}
 	
@@ -172,13 +271,16 @@ public class GameActivity extends SherlockFragmentActivity {
 
 	@Override
 	protected void onResume() {
+        registerReceiver(mIntentReceiver, mIntentFilter);
+		
+        if(application.getCellUsers() != null && application.getCellUsers().size() != 0)
+        	setFragmentGui();
 
 		super.onResume();
 	}
 
 	@Override
 	protected void onStart() {
-
 		super.onStart();
 	}
 

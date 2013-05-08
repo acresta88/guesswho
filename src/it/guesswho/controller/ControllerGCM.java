@@ -6,6 +6,7 @@ import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.utils.NetworkUtils;
 import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 public class ControllerGCM {
 	private GuessWhoApplication application;
@@ -38,8 +39,13 @@ public class ControllerGCM {
         if(!registeredToTheServer)
         {
         	Log.d(tag, "not registered to the server, regitering now!");
+        	try{
         	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId(), application.getUser().getName());
         	registeredToTheServer = true;
+        	} catch(NullPointerException e)
+        	{
+        		Toast.makeText(activity.getApplicationContext(), "user data incomplete, try to log in again", Toast.LENGTH_SHORT).show();
+        	}
         }
         else
         	Log.d(tag, "already registered to my server!");
@@ -47,8 +53,8 @@ public class ControllerGCM {
 	}
 
 	
-	public void sendGCMMessage(String senderId, String receiverId, String message)
+	public void sendGCMMessage(String senderId, String receiverId, String message, String answer)
     {
-		NetworkUtils.sendGCMMessage(senderId, receiverId, message);
+		NetworkUtils.sendGCMMessage(senderId, receiverId, message, answer);
     }
 }

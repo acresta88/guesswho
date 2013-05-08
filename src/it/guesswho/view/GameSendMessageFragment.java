@@ -1,0 +1,78 @@
+package it.guesswho.view;
+
+import it.guesswho.R;
+import it.guesswho.controller.ControllerGCM;
+import it.guesswho.model.GuessWhoApplication;
+import it.guesswho.utils.NetworkUtils;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+
+import com.actionbarsherlock.app.SherlockFragment;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
+/**
+ * Fragement in which is possible to create a PostIt
+ * @author AC, DD
+ */
+public class GameSendMessageFragment extends SherlockFragment {
+	
+	public static final String ARG_SECTION_NUMBER = "section_number";
+	private GuessWhoApplication application;
+	private String tag = "messages";
+	private MainActivity mActivity;
+	private Button sendButton;
+	private EditText text;
+	private ControllerGCM controllore;
+	
+	public GameSendMessageFragment()
+	{
+		
+	}
+	
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            Bundle savedInstanceState) {
+			// Inflate the layout for this fragment
+			View V = inflater.inflate(R.layout.fragment_gamesendmessage, container, false);
+			
+			controllore = new ControllerGCM(getActivity());
+			application = (GuessWhoApplication) getActivity().getApplication();
+			text = (EditText) V.findViewById(R.id.fragment_text);
+			sendButton = (Button) V.findViewById(R.id.fragment_sendbutton);
+			sendButton.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					String t;
+					if(text.getText() == null)
+						t = "Messaggio vuoto";
+					else
+						t = text.getText().toString();
+					
+					Log.d(tag, "onclick text: " + t);
+					controllore.sendGCMMessage(application.getUser().getId(), application.getUser().getId(), t, "");
+				}
+			});
+			return V;
+			
+	}
+    
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.add("Search")
+        .setIcon(R.drawable.abs__ic_clear_normal)
+        .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+		
+		super.onCreateOptionsMenu(menu, inflater);
+     
+    }
+
+}

@@ -1,31 +1,25 @@
 package it.guesswho.view;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-
 import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
-import it.guesswho.view.AvatarsActivity.ImageAdapter;
+import it.guesswho.utils.NetworkUtils;
+
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -41,7 +35,6 @@ public class GameFragment extends SherlockFragment {
 	private ArrayList<User> users;
     private Boolean[] visualizedUsers;
     private GuessWhoApplication application;
-    private Bitmap[] images;
     
 	public static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -58,7 +51,10 @@ public class GameFragment extends SherlockFragment {
 			
 			application = (GuessWhoApplication) getActivity().getApplication();
 		    users = application.getCellUsers();
-		    images = new Bitmap[users.size()];
+		    
+		    if(application.getImages() == null || application.getImages().length != users.size())
+		    	application.setImages(new Bitmap[users.size()]);
+		    
 		    
 		    GridView gridview = (GridView) V.findViewById(R.id.gridview);
 		    gridview.setAdapter(new ImageAdapter(getActivity()));
@@ -78,13 +74,13 @@ public class GameFragment extends SherlockFragment {
 		            	View grid = (View)v; 
 		            	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
 		            	
-		            	if(images[position] == null)
+		            	if(application.getImage(position) == null)
 		    	    	{
-		            		Bitmap img = getBitmapFromURL(getUrlFacebookUserAvatar(users.get(position).getId()));
-		            		images[position] = img;
+		            		Bitmap img = NetworkUtils.getBitmapFromURL(NetworkUtils.getUrlFacebookUserAvatar(users.get(position).getId()));
+		            		application.setImage(position, img);
 		    	    	}
 		    	    		
-		            	imageView.setImageBitmap(images[position]);
+		            	imageView.setImageBitmap(application.getImage(position));
 		    	    	
 //				   	    imageView.setImageBitmap(getBitmapFromURL(getUrlFacebookUserAvatar(users.get(position).getId())));
 		            }
@@ -158,13 +154,13 @@ public class GameFragment extends SherlockFragment {
 	    	}
 		     
 	    	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
-	    	if(images[position] == null)
+	    	if(application.getImage(position) == null)
 	    	{
-        		Bitmap img = getBitmapFromURL(getUrlFacebookUserAvatar(users.get(position).getId()));
-        		images[position] = img;
+        		Bitmap img = NetworkUtils.getBitmapFromURL(NetworkUtils.getUrlFacebookUserAvatar(users.get(position).getId()));
+        		application.setImage(position, img);
 	    	}
 	    		
-        	imageView.setImageBitmap(images[position]);
+        	imageView.setImageBitmap(application.getImage(position));
 	    	
 	    	TextView textView = (TextView)grid.findViewById(R.id.text);
 	    	textView.setText(users.get(position).getName());
@@ -173,40 +169,6 @@ public class GameFragment extends SherlockFragment {
 	    }
 	}
 	
-	private String getUrlFacebookUserAvatar(String name_or_idUser )
-	{
-		String address = "http://graph.facebook.com/"+name_or_idUser+"/picture?type=normal";
-	    URL url;
-	    String newLocation = null;
-	    try {
-	        url = new URL(address);
-	        HttpURLConnection.setFollowRedirects(false); //Do _not_ follow redirects!
-	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	        newLocation = connection.getHeaderField("Location");
-	    } catch (MalformedURLException e) {
-	        e.printStackTrace();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
-
-	    return newLocation;
-	}
 	
-	public Bitmap getBitmapFromURL(String src) {
-	    try {
-	        URL url = new URL(src);
-	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	        connection.setDoInput(true);
-	        connection.connect();
-	        InputStream input = connection.getInputStream();
-	        Bitmap myBitmap = BitmapFactory.decodeStream(input);
-	        return myBitmap;
-	    } catch (IOException e) {   
-	        e.printStackTrace();
-	        return null;
-	    }
-	}
-	
-
 	
 }

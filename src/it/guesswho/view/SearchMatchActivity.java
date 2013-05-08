@@ -3,7 +3,6 @@ package it.guesswho.view;
 import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
-import it.guesswho.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
@@ -20,11 +19,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.facebook.HttpMethod;
-import com.facebook.Request;
-import com.facebook.Request.Callback;
-import com.facebook.Response;
 
 public class SearchMatchActivity extends Activity {
 	
@@ -173,9 +167,9 @@ public class SearchMatchActivity extends Activity {
     }
 
 	private void startAvatarsActivity(ArrayList<User> users) {
-		Intent i = new Intent(this, AvatarsActivity.class);
+		Intent i = new Intent(this, GameActivity.class);
 		application.setCellUsers(users);
-		
+		application.clearImages();
 		if(users != null && users.size() > 0)
 			startActivity(i);
 		else

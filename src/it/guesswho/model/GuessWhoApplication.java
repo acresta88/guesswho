@@ -1,8 +1,11 @@
 package it.guesswho.model;
 
+import it.guesswho.view.GameActivity;
+
 import java.util.ArrayList;
 
 import android.app.Application;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.facebook.Session;
@@ -16,6 +19,8 @@ public class GuessWhoApplication extends Application{
     private ArrayList<User> friends;
     
     private String tag = "application";
+	private GameActivity gameActivity;
+    private static Bitmap[] images;
     
     @Override
     public void onCreate()
@@ -68,5 +73,43 @@ public class GuessWhoApplication extends Application{
 	
 	public ArrayList<User> getFriendList() {
 		return this.friends;
+	}
+
+	public void setGameActivity(GameActivity gameActivity) {
+		this.gameActivity = gameActivity;
+	}
+	
+	public GameActivity getGameActivity()
+	{
+		return this.gameActivity;
+	}
+
+	public static Bitmap[] getImages() {
+		return images;
+	}
+
+	public static void setImages(Bitmap[] images) {
+		GuessWhoApplication.images = images;
+	}
+	
+	public void setImage (int position, Bitmap image)
+	{
+		if(position < this.images.length)
+			images[position] = image;
+		else 
+			Log.d(tag, "error during the insert of the image");
+	}
+	
+	public Bitmap getImage (int position)
+	{
+		if(position < this.images.length)
+			return images[position];
+		else 
+			Log.d(tag, "error during the retrieve of the image");
+		return null;
+	}
+
+	public void clearImages() {
+		images = null;
 	}
 }
