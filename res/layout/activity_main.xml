@@ -43,6 +43,11 @@
                     facebook:preset_size="normal"/>
 
             <Button
+                android:id="@+id/myLoginButton"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Login" />
+            <Button
                 android:id="@+id/newGameButton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

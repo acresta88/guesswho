@@ -151,6 +151,7 @@ public class FriendPicker extends Activity {
 
 					/* message to the server for creating the match */
 					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), b.getString("userId"), b.getString("userName"), users);
+					application.setOpponent(b.getString("userId"));
 					application.clearImages();
 					startAvatarsActivity();
 				} catch (JSONException e) {

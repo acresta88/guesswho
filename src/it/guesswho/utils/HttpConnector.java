@@ -27,8 +27,8 @@ import android.util.Log;
 public class HttpConnector {
 	
 	private static String tag = "http";
-	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
-//	private static String HOSTNAME = "http://192.168.1.64:5000/";
+//	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
+	private static String HOSTNAME = "http://192.168.1.76:5000/";
 //	private static String HOSTNAME = "http://192.168.1.100:5000/";
 //	private static String HOSTNAME = "http://192.168.165.245:5000/";
 

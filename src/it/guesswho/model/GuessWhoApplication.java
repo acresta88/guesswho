@@ -17,6 +17,8 @@ public class GuessWhoApplication extends Application{
 	private String gcmId;
     private Session session;
     private ArrayList<User> friends;
+    private String target;
+    private String opponent;
     
     private String tag = "application";
 	private GameActivity gameActivity;
@@ -111,5 +113,21 @@ public class GuessWhoApplication extends Application{
 
 	public void clearImages() {
 		images = null;
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	public String getOpponent() {
+		return this.opponent;
+	}
+
+	public void setOpponent(String opponent) {
+		this.opponent = opponent;
 	}
 }

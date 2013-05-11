@@ -33,6 +33,15 @@
                 android:paddingRight="32dp"
                 android:text="Send msg" />
              
+            <Button
+                android:id="@+id/fragment_guessbutton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginTop="16dp"
+                android:paddingLeft="32dp"
+                android:paddingRight="32dp"
+                android:text="Try to Guess" />
             
         </LinearLayout>
     </ScrollView>

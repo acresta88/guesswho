@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -56,7 +57,7 @@ public class GameMessagesFragment extends SherlockFragment {
 		{	
 			listMessages = savedInstanceState.getStringArrayList("messages");
 			listAnswers = savedInstanceState.getStringArrayList("answers");
-		}
+		} 
 		if (listMessages == null)
 		{
 			listMessages = new ArrayList<String>();
@@ -134,8 +135,13 @@ public class GameMessagesFragment extends SherlockFragment {
 		for(int i = 0; i < listMessages.size(); i++)
 		{
 			if(listMessages.get(i).equals(message))
-			{
+			{ 
 				listAnswers.set(i, answer);
+//				if(answer.equals("yes"))
+//					(this.listView.getChildAt(i)).setBackgroundColor(Color.GREEN);
+//				else
+//					(this.listView.getChildAt(i)).setBackgroundColor(Color.RED);
+
 				listMessages.set(i, listMessages.get(i) + " = " + answer );
 			}
 		}

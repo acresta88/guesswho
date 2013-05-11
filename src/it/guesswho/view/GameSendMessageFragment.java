@@ -4,6 +4,7 @@ import it.guesswho.R;
 import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.utils.NetworkUtils;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -29,6 +31,7 @@ public class GameSendMessageFragment extends SherlockFragment {
 	private String tag = "messages";
 	private MainActivity mActivity;
 	private Button sendButton;
+	private Button guessButton;
 	private EditText text;
 	private ControllerGCM controllore;
 	
@@ -59,6 +62,45 @@ public class GameSendMessageFragment extends SherlockFragment {
 					
 					Log.d(tag, "onclick text: " + t);
 					controllore.sendGCMMessage(application.getUser().getId(), application.getUser().getId(), t, "");
+				}
+			});
+			
+			guessButton = (Button) V.findViewById(R.id.fragment_guessbutton);
+			guessButton.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					String t;
+					if(text.getText() == null)
+						t = "Messaggio vuoto";
+					else
+						t = text.getText().toString();
+					
+					Log.d(tag, "onclick text: " + t);
+					int i;
+					boolean res = false;
+					for(i = 0; i < application.getCellUsers().size(); i++)
+					{
+						if(application.getCellUsers().get(i).getName().equals(t))
+						{
+							Log.d(tag, "trying to guess " + application.getCellUsers().get(i).getId());
+							res = NetworkUtils.closeMatch(application.getUser().getId(), application.getOpponent(), application.getCellUsers().get(i).getId());
+							break;
+						}
+					}
+					if(i == application.getCellUsers().size())
+						Toast.makeText(getActivity(), "The inserted name doesn't exist!", Toast.LENGTH_SHORT).show();
+					else
+					{
+						if(res)
+						{
+							Toast.makeText(getActivity(), "YOU WIN!!", Toast.LENGTH_SHORT).show();
+							Intent intent = new Intent(getActivity(), MainActivity.class);
+							startActivity(intent);
+						}
+						else
+							Toast.makeText(getActivity(), "The inserted name is not the correct one!", Toast.LENGTH_SHORT).show();
+					}
 				}
 			});
 			return V;

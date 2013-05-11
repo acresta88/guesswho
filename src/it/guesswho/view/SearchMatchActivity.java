@@ -1,6 +1,7 @@
 package it.guesswho.view;
 
 import it.guesswho.R;
+import it.guesswho.controller.ControllerFB;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
 
@@ -126,6 +127,7 @@ public class SearchMatchActivity extends Activity {
 
 	 	    @Override
 	 	    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+	 	    	application.setOpponent(users.get(position).getId());
 	 	    	onClickNewGame(users.get(position).getId());
 	 	    }
 
@@ -157,8 +159,11 @@ public class SearchMatchActivity extends Activity {
 
 						User u = new User("", listId.get(j).toString());
 						list.add(u);
+						ControllerFB controllore = new ControllerFB(this);
+						controllore.askFriendName(listId.get(j).toString());
 					}
-			    	startAvatarsActivity(list);
+					application.setCellUsers(list);
+//			    	startAvatarsActivity(list);
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -166,9 +171,27 @@ public class SearchMatchActivity extends Activity {
 		}
     }
 
-	private void startAvatarsActivity(ArrayList<User> users) {
+	public void callback(String id, String name)
+	{
+		int cont = 0;
+		for(int i = 0; i < application.getCellUsers().size(); i++)
+		{
+			if(application.getCellUsers().get(i).getId().equals(id))
+			{
+				application.getCellUsers().get(i).setName(name);
+			}
+			if(!application.getCellUsers().get(i).getName().equals(""))
+			{
+				cont++;
+			}
+		}
+		if(cont == application.getCellUsers().size())
+		{
+	    	startAvatarsActivity();
+		}
+	}
+	private void startAvatarsActivity() {
 		Intent i = new Intent(this, GameActivity.class);
-		application.setCellUsers(users);
 		application.clearImages();
 		if(users != null && users.size() > 0)
 			startActivity(i);

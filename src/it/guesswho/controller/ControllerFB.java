@@ -3,6 +3,7 @@ package it.guesswho.controller;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
 import it.guesswho.view.FriendPicker;
+import it.guesswho.view.SearchMatchActivity;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,7 @@ import com.facebook.HttpMethod;
 import com.facebook.Request;
 import com.facebook.Request.Callback;
 import com.facebook.Response;
+import com.facebook.model.GraphUser;
 
 public class ControllerFB {
 	private GuessWhoApplication application;
@@ -67,6 +69,31 @@ public class ControllerFB {
 					}
 				}
 			});
+		r.executeAsync();
+	}
+	
+	public void askFriendName(String id) {
+		
+		Log.d("ControllerFB", "ask name of:"+id);
+		// retrieving friends
+		Request r = new Request(application.getSession(), id, null,
+				HttpMethod.GET, new Callback() {
+
+				@Override
+				public void onCompleted(Response response) {
+					try {
+						String name = response.getGraphObject().getInnerJSONObject().getString("name");
+						String id = response.getGraphObject().getInnerJSONObject().getString("id");
+						Log.d("ControllerFB", "found name: " + name);
+
+						((SearchMatchActivity)activity).callback(id, name);
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+				};
+		});
 		r.executeAsync();
 	}
 }

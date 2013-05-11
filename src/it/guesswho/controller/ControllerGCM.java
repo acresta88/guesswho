@@ -36,8 +36,8 @@ public class ControllerGCM {
         application.setGcmId(regId);
         
         
-        if(!registeredToTheServer)
-        {
+//        if(!registeredToTheServer)
+//        {
         	Log.d(tag, "not registered to the server, regitering now!");
         	try{
         	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId(), application.getUser().getName());
@@ -46,9 +46,9 @@ public class ControllerGCM {
         	{
         		Toast.makeText(activity.getApplicationContext(), "user data incomplete, try to log in again", Toast.LENGTH_SHORT).show();
         	}
-        }
-        else
-        	Log.d(tag, "already registered to my server!");
+//        }
+//        else
+//        	Log.d(tag, "already registered to my server!");
 
 	}
 

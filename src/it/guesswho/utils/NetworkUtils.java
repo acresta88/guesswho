@@ -152,4 +152,57 @@ public class NetworkUtils {
 	        return null;
 	    }
 	}
+
+
+	public static boolean setTarget(String facebookId, String opponent, String target) {
+		JSONObject json = new JSONObject();
+		
+        try {
+	        json.put("opponentFbId", opponent); 
+        	json.put("target", target);
+			json.put("fbId", facebookId);
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        
+        HttpResponse response = HttpConnector.postMessage("game/target/", json.toString());
+        try {
+			String answer = EntityUtils.toString(response.getEntity());
+			return answer.equals("target set");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return false;
+	}
+	
+	public static boolean closeMatch(String facebookId, String opponent, String guessName) {
+		JSONObject json = new JSONObject();
+		
+        try {
+	        json.put("opponentFbId", opponent); 
+        	json.put("choice", guessName);
+			json.put("fbId", facebookId);
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+        
+        HttpResponse response = HttpConnector.postMessage("game/close/", json.toString());
+        try {
+			String answer = EntityUtils.toString(response.getEntity());
+			return answer.equals("guessed");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return false;
+	}
 }

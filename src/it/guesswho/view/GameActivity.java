@@ -4,6 +4,7 @@ package it.guesswho.view;
 import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
+import it.guesswho.task.PrefetchingTask;
 import it.guesswho.utils.StaticVariables;
 
 import java.util.ArrayList;
@@ -62,10 +63,15 @@ public class GameActivity extends SherlockFragmentActivity {
 	    		Log.d(tag, "received message");
 	    		String message = intent.getExtras().getString("content");
 		    	String answer = intent.getExtras().getString("answer");
-		    	
+		    	String sender = intent.getExtras().getString("sender");
 		    	Log.d("GCMService", "broadcast receiver:" + message);
 		    	if(answer == null || answer.equals(""))
-		    		((GameMessagesFragment) mSectionsPagerAdapter.getItem(1)).addInList(message);
+		    	{
+		    		if(sender.equals(application.getUser().getId()))
+		    			((GameMessagesFragment) mSectionsPagerAdapter.getItem(1)).addInList(message);
+		    		else
+		    			((GameMessagesFragment) mSectionsPagerAdapter.getItem(2)).addInList(message);
+		    	}
 		    	else
 		    	{
 		    		((GameMessagesFragment) mSectionsPagerAdapter.getItem(1)).setAnswer(message, answer);
@@ -107,9 +113,11 @@ public class GameActivity extends SherlockFragmentActivity {
 				application.setCellUsers(newusers);
 
 				application.setImages(new Bitmap[users.size()]);
-				PrefetchingTask task = new PrefetchingTask(application);
-			    task.execute();
-
+				for(int i = 0; i < application.getCellUsers().size(); i++)
+				{
+					PrefetchingTask task = new PrefetchingTask(application, application.getCellUsers().get(i).getId());
+				    task.execute();
+				}
 				setFragmentGui();
 				
 	    	}
@@ -134,10 +142,12 @@ public class GameActivity extends SherlockFragmentActivity {
 	{
 		Log.d(tag, "setting gui");
 		
-		fragments = new Fragment[3];
+		fragments = new Fragment[4];
 		fragments[0] = new GameFragment();
 		fragments[1] = new GameMessagesFragment();
-		fragments[2] = new GameSendMessageFragment();
+		fragments[2] = new GameMessagesFragment();
+		fragments[3] = new GameSendMessageFragment();
+		
 		
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
@@ -219,8 +229,10 @@ public class GameActivity extends SherlockFragmentActivity {
 			case 0:
 				return "Game Court";
 			case 1:
-				return "Message history ";
+				return "My Message history";
 			case 2:
+				return "Opponent Messages";
+			case 3:
 				return "Send message ";
 			}
 			return "No fragment";

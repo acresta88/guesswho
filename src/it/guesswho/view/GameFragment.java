@@ -7,12 +7,15 @@ import it.guesswho.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
+import android.R.string;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -20,6 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.view.Menu;
@@ -35,6 +39,7 @@ public class GameFragment extends SherlockFragment {
 	private ArrayList<User> users;
     private Boolean[] visualizedUsers;
     private GuessWhoApplication application;
+    private String tag = "GameFragment";
     
 	public static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -49,6 +54,7 @@ public class GameFragment extends SherlockFragment {
 			// Inflate the layout for this fragment
 			View V = inflater.inflate(R.layout.fragment_game, container, false);
 			
+			Toast.makeText(getActivity(), "the first avatar you will click it will be your target for this match", Toast.LENGTH_LONG).show();
 			application = (GuessWhoApplication) getActivity().getApplication();
 		    users = application.getCellUsers();
 		    
@@ -61,36 +67,90 @@ public class GameFragment extends SherlockFragment {
 		    
 		    gridview.setOnItemClickListener(new OnItemClickListener() {
 		        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+					Log.d(tag, "onItemClick");
 
-		            if(visualizedUsers[position])
-		            {
-		            	View grid = (View)v; 
-		            	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
-				   	    imageView.setImageResource(R.drawable.default_pic);
-
-		            }
-		            else
-		            {
-		            	View grid = (View)v; 
-		            	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
-		            	
-		            	if(application.getImage(position) == null)
-		    	    	{
-		            		Bitmap img = NetworkUtils.getBitmapFromURL(NetworkUtils.getUrlFacebookUserAvatar(users.get(position).getId()));
-		            		application.setImage(position, img);
-		    	    	}
-		    	    		
-		            	imageView.setImageBitmap(application.getImage(position));
-		    	    	
-//				   	    imageView.setImageBitmap(getBitmapFromURL(getUrlFacebookUserAvatar(users.get(position).getId())));
-		            }
-		    	     
-
-		            visualizedUsers[position] = !visualizedUsers[position];
-
+					if(application.getTarget() == null || application.getTarget().equals(""))
+					{
+						Log.d(tag, "onLongClick");
+						View grid = (View)v; 
+						TextView textView = (TextView)grid.findViewById(R.id.text);
+				   	    String text = (String) textView.getText();
+				   	    Log.d(tag, "onLongClick text:"+text);
+				   	    String idT = null;
+				   	    for(int i = 0; i < application.getCellUsers().size(); i++)
+				   	    {
+				   	    	if(application.getCellUsers().get(i).getName().equals(text))
+				   	    	{
+				   	    		idT = application.getCellUsers().get(i).getId();
+				   	    		Log.d(tag, "onLongClick id: "+id);
+				   	    		break;
+				   	    	}
+				   	    }
+				   	    boolean res = false;
+				   	    if(idT != null)
+				   	    	res = NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), idT);
+				   	    
+				   	    Log.d(tag, "target set:"+res);
+				   	    if(res)
+				   	    {
+				   	    	application.setTarget(idT);
+				   	    }
+					}
+					else
+					{
+			            if(visualizedUsers[position])
+			            {
+			            	View grid = (View)v; 
+			            	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
+					   	    imageView.setImageResource(R.drawable.default_pic);
+	
+			            }
+			            else
+			            {
+			            	View grid = (View)v; 
+			            	ImageView imageView = (ImageView)grid.findViewById(R.id.image);
+			            	
+			            	if(application.getImage(position) == null)
+			    	    	{
+			            		Bitmap img = NetworkUtils.getBitmapFromURL(NetworkUtils.getUrlFacebookUserAvatar(users.get(position).getId()));
+			            		application.setImage(position, img);
+			    	    	}
+			    	    		
+			            	imageView.setImageBitmap(application.getImage(position));
+			    	    	
+	//				   	    imageView.setImageBitmap(getBitmapFromURL(getUrlFacebookUserAvatar(users.get(position).getId())));
+			            }
+			    	     
+	
+			            visualizedUsers[position] = !visualizedUsers[position];
+					}
 		        }
 		    });
 
+		    gridview.setOnLongClickListener(new OnLongClickListener() {
+				
+				@Override
+				public boolean onLongClick(View v) {
+					Log.d(tag, "onLongClick");
+					View grid = (View)v; 
+					TextView textView = (TextView)grid.findViewById(R.id.text);
+			   	    String text = (String) textView.getText();
+			   	    Log.d(tag, "onLongClick text:"+text);
+			   	    String id = null;
+			   	    for(int i = 0; i < application.getCellUsers().size(); i++)
+			   	    {
+			   	    	if(application.getCellUsers().get(i).getName().equals(text))
+			   	    	{
+			   	    		id = application.getCellUsers().get(i).getId();
+			   	    		Log.d(tag, "onLongClick id: "+id);
+			   	    		break;
+			   	    	}
+			   	    }
+			   	    if(id != null)
+			   	    	NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), id);
+					return false;
+				}
+		    });
 			return V;
 	}
 	
