@@ -14,6 +14,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 
 
@@ -24,11 +25,12 @@ import android.util.Log;
  * @author daniele
  *
  */
+@SuppressLint("NewApi")
 public class HttpConnector {
 	
 	private static String tag = "http";
-//	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
-	private static String HOSTNAME = "http://192.168.1.76:5000/";
+	private static String HOSTNAME = "http://arcane-falls-6796.herokuapp.com/";
+//	private static String HOSTNAME = "http://192.168.1.76:5000/";
 //	private static String HOSTNAME = "http://192.168.1.100:5000/";
 //	private static String HOSTNAME = "http://192.168.165.245:5000/";
 
@@ -96,7 +98,8 @@ public static HttpResponse putMessage(String url,String jsonMessage) {
 	}
 
 public static HttpResponse postMessage(String url,String jsonMessage) {
-	url = HOSTNAME + url;
+	
+   	url = HOSTNAME + url;
 
 	Log.d(tag,"trying "+url+ " with: " +jsonMessage);
 	HttpResponse response = null;

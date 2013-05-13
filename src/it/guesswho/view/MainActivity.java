@@ -3,13 +3,16 @@ package it.guesswho.view;
 import it.guesswho.R;
 import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
+import it.guesswho.task.OnResultCallback;
 import it.guesswho.utils.GUIUtils;
 import it.guesswho.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +35,7 @@ import com.facebook.widget.ProfilePictureView;
  * @author andrea
  * 
  */
+@SuppressLint("NewApi")
 public class MainActivity extends FragmentActivity {
 
 	private String tagLogin = "login";
@@ -58,11 +62,21 @@ public class MainActivity extends FragmentActivity {
 			onSessionStateChange(session, state, exception);
 		}
 	};
-
+	
+	private void onSessionStateChange(Session session, SessionState state,
+			Exception exception) {
+		Log.d(tagSession, "onSessionStateChange: " + state.toString());
+		application.setSession(session);
+		this.updateUI();
+	}
+	@SuppressLint("NewApi")
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(null);
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
+		StrictMode.setThreadPolicy(policy); 
 		setContentView(R.layout.activity_main);
 
 		if (NetworkUtils.isConnected(this)) {
@@ -106,25 +120,36 @@ public class MainActivity extends FragmentActivity {
 				public void onClick(View view) {
 					Log.d("http", "search request " + application.getGcmId()
 							+ " - " + application.getUser().getId());
-					ArrayList<String> users = NetworkUtils.searchMatches(
-							application.getGcmId(), application.getUser()
-									.getId());
-					// create an appropriate activity
-					Intent i = new Intent(application.getApplicationContext(),
-							SearchMatchActivity.class);
-					i.putStringArrayListExtra("users", users);
-					startActivity(i);
-
+					
+					NetworkUtils.searchMatches(
+							application.getGcmId(), 
+							application.getUser().getId(),
+							new OnResultCallback() {
+								
+								@Override
+								public void onTaskCompleted(Object response) {
+									ArrayList<String> users = (ArrayList<String>) response;
+									// create an appropriate activity
+									Intent i = new Intent(application.getApplicationContext(),
+											SearchMatchActivity.class);
+									i.putStringArrayListExtra("users", users);
+									startActivity(i);
+								}
+							});
 				}
 			});
 
 			myLoginButton = (Button) findViewById(R.id.myLoginButton);
 			myLoginButton.setOnClickListener(new View.OnClickListener() {
 				public void onClick(View view) {
+//					LoginTask loginTask = new LoginTask(MainActivity.this);
+//					loginTask.execute(new Bundle[0]);
 					autoLogin(null);
 				}
 			});
 			autoLogin(savedInstanceState);
+//			LoginTask loginTask = new LoginTask(this);
+//			loginTask.execute(savedInstanceState);
 		} else {
 			GUIUtils.noConnectionMethod(this);
 		}
@@ -181,14 +206,7 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
-	private void onSessionStateChange(Session session, SessionState state,
-			Exception exception) {
-		Log.d(tagSession, "onSessionStateChange: " + state.toString());
-		application.setSession(session);
-		updateUI();
-	}
-
-	private void updateUI() {
+	public void updateUI() {
 		Session session = Session.getActiveSession();
 		boolean enableButtons = (session != null && session.isOpened());
 		Log.d(tagLogin, "session active?" + enableButtons + " exp date:"

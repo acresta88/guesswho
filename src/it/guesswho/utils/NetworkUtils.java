@@ -1,6 +1,9 @@
 package it.guesswho.utils;
 
 import it.guesswho.model.User;
+import it.guesswho.task.HttpTask;
+import it.guesswho.task.OnHttpTaskCompletedCallback;
+import it.guesswho.task.OnResultCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
 import org.apache.http.util.EntityUtils;
@@ -25,6 +27,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 public class NetworkUtils {
+	private static String tag = "NetworkUtils";
 	public static boolean isConnected(Context c)
 	{
 		ConnectivityManager connectivityManager = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -34,7 +37,7 @@ public class NetworkUtils {
 	}
 	
 	
-	public static void sendGCMMessage(String senderId, String receiverId, String message, String answer)
+	public static void sendGCMMessage(String senderId, String receiverId, String message, String answer, OnResultCallback callback)
 	{
 		JSONObject json = new JSONObject();
          
@@ -47,10 +50,25 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
        
-        HttpConnector.postMessage("gcm/msg/", json.toString());
+        HttpTask httpTask = new HttpTask("gcm/msg/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+			
+			@Override
+			public void onTaskCompleted(HttpResponse response, OnResultCallback onResultCallback) {
+				String answer = "";
+				try {
+					answer = EntityUtils.toString(response.getEntity());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				onResultCallback.onTaskCompleted(answer);
+			}
+		});
+        httpTask.execute();
 	}
 
-	public static void registerToServer(String gcmId, String facebookId, String name)
+	public static void registerToServer(String gcmId, String facebookId, String name, OnResultCallback callback)
 	{
 		JSONObject json = new JSONObject();
         try {
@@ -61,10 +79,19 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
          
-        HttpConnector.postMessage("gcm/create/", json.toString());
+        HttpTask httpTask = new HttpTask("game/create/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+
+			@Override
+			public void onTaskCompleted(HttpResponse response,
+					OnResultCallback onResultCallback) {
+				onResultCallback.onTaskCompleted(response);
+			}
+        	
+        });
+        httpTask.execute();
 	}
 
-	public static void createMatch(String gcmId, String facebookId, String name, String opponentId, String opponentName, ArrayList<User> users)
+	public static void createMatch(String gcmId, String facebookId, String name, String opponentId, String opponentName, ArrayList<User> users, OnResultCallback callback)
 	{
 		JSONObject json = new JSONObject();
 		
@@ -84,12 +111,20 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
         
-        HttpConnector.postMessage("game/create/", json.toString());
+        HttpTask httpTask = new HttpTask("game/create/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+
+			@Override
+			public void onTaskCompleted(HttpResponse response,
+					OnResultCallback onResultCallback) {
+				onResultCallback.onTaskCompleted(response);
+			}
+        	
+        });
+        httpTask.execute();
 	}
 	
-	public static ArrayList<String> searchMatches(String gcmId, String facebookId)
+	public static void searchMatches(String gcmId, String facebookId, OnResultCallback callback)
 	{
-		ArrayList<String> matches = new ArrayList<String>();
 		JSONObject json = new JSONObject();
          
         try {
@@ -99,24 +134,30 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
        
-        HttpResponse response = HttpConnector.postMessage("game/search/", json.toString());
-        try {
+        HttpTask httpTask = new HttpTask("game/search/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+			
+			@Override
+			public void onTaskCompleted(HttpResponse response, OnResultCallback onResultCallback) {
+				ArrayList<String> matches = new ArrayList<String>();
 
-			JSONArray jsonArray = new JSONArray(EntityUtils.toString(response.getEntity()));
-			for(int i = 0; i < jsonArray.length(); i++)
-			{
-				matches.add(jsonArray.getString(i));
+				try {
+					JSONArray jsonArray = new JSONArray(EntityUtils.toString(response.getEntity()));
+					for(int i = 0; i < jsonArray.length(); i++)
+					{
+						matches.add(jsonArray.getString(i));
+					}
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				Log.d("http", matches.toString());
+				onResultCallback.onTaskCompleted(matches);
 			}
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-        Log.d("http", matches.toString());
-		return matches;
-
+		});
+        httpTask.execute();
 	}
 
 	public static String getUrlFacebookUserAvatar(String name_or_idUser )
@@ -154,7 +195,7 @@ public class NetworkUtils {
 	}
 
 
-	public static boolean setTarget(String facebookId, String opponent, String target) {
+	public static void setTarget(String facebookId, String opponent, String target, OnResultCallback callback) {
 		JSONObject json = new JSONObject();
 		
         try {
@@ -166,21 +207,25 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
         
-        HttpResponse response = HttpConnector.postMessage("game/target/", json.toString());
-        try {
-			String answer = EntityUtils.toString(response.getEntity());
-			return answer.equals("target set");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return false;
+        HttpTask httpTask = new HttpTask("game/target/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+			
+			@Override
+			public void onTaskCompleted(HttpResponse response, OnResultCallback onResultCallback) {
+				String answer = "";
+				try {
+					answer = EntityUtils.toString(response.getEntity());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				onResultCallback.onTaskCompleted(answer);
+			}
+		});
+        httpTask.execute();
 	}
 	
-	public static boolean closeMatch(String facebookId, String opponent, String guessName) {
+	public static void closeMatch(String facebookId, String opponent, String guessName, OnResultCallback callback) {
 		JSONObject json = new JSONObject();
 		
         try {
@@ -192,17 +237,23 @@ public class NetworkUtils {
 			e.printStackTrace();
 		}
         
-        HttpResponse response = HttpConnector.postMessage("game/close/", json.toString());
-        try {
-			String answer = EntityUtils.toString(response.getEntity());
-			return answer.equals("guessed");
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        return false;
+        HttpTask httpTask = new HttpTask("game/close/", json.toString(), callback, new OnHttpTaskCompletedCallback() {
+			
+			@Override
+			public void onTaskCompleted(HttpResponse response, OnResultCallback onResultCallback) {
+				String answer = "";
+				try {
+					if(response != null)
+						answer = EntityUtils.toString(response.getEntity());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				onResultCallback.onTaskCompleted(answer.equals("guessed"));
+			}
+		});
+        httpTask.execute();
+        
 	}
 }

@@ -4,6 +4,7 @@ import it.guesswho.R;
 import it.guesswho.controller.ControllerFB;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
+import it.guesswho.task.OnResultCallback;
 import it.guesswho.utils.NetworkUtils;
 import it.guesswho.utils.StaticVariables;
 
@@ -150,10 +151,16 @@ public class FriendPicker extends Activity {
 					}
 
 					/* message to the server for creating the match */
-					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), b.getString("userId"), b.getString("userName"), users);
-					application.setOpponent(b.getString("userId"));
-					application.clearImages();
-					startAvatarsActivity();
+					NetworkUtils.createMatch(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), b.getString("userId"), b.getString("userName"), users, new OnResultCallback() {
+						
+						@Override
+						public void onTaskCompleted(Object response) {
+							application.setOpponent(b.getString("userId"));
+							application.clearImages();
+							startAvatarsActivity();							
+						}
+					});
+					
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (NullPointerException e) {

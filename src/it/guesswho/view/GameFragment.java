@@ -3,13 +3,14 @@ package it.guesswho.view;
 import it.guesswho.R;
 import it.guesswho.model.GuessWhoApplication;
 import it.guesswho.model.User;
+import it.guesswho.task.OnResultCallback;
 import it.guesswho.utils.NetworkUtils;
 
 import java.util.ArrayList;
 
-import android.R.string;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -54,7 +55,6 @@ public class GameFragment extends SherlockFragment {
 			// Inflate the layout for this fragment
 			View V = inflater.inflate(R.layout.fragment_game, container, false);
 			
-			Toast.makeText(getActivity(), "the first avatar you will click it will be your target for this match", Toast.LENGTH_LONG).show();
 			application = (GuessWhoApplication) getActivity().getApplication();
 		    users = application.getCellUsers();
 		    
@@ -88,13 +88,20 @@ public class GameFragment extends SherlockFragment {
 				   	    }
 				   	    boolean res = false;
 				   	    if(idT != null)
-				   	    	res = NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), idT);
-				   	    
-				   	    Log.d(tag, "target set:"+res);
-				   	    if(res)
-				   	    {
-				   	    	application.setTarget(idT);
-				   	    }
+				   	    	NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), idT, new OnResultCallback() {
+								
+								@Override
+								public void onTaskCompleted(Object response) {
+									String res = (String)response; 
+									if(res != null && !res.equals(""))
+									{
+										application.setTarget(res);
+								   	    Log.d(tag, "target set:"+res);
+									}
+									else
+										Log.d(tag, "target didn't set");
+								}
+							});
 					}
 					else
 					{
@@ -147,7 +154,23 @@ public class GameFragment extends SherlockFragment {
 			   	    	}
 			   	    }
 			   	    if(id != null)
-			   	    	NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), id);
+			   	    {
+			   	    	
+			   	    	NetworkUtils.setTarget(application.getUser().getId(), application.getOpponent(), id, new OnResultCallback() {
+							
+							@Override
+							public void onTaskCompleted(Object response) {
+								String res = (String)response; 
+								if(res != null && !res.equals(""))
+								{
+									application.setTarget(res);
+							   	    Log.d(tag, "target set:"+res);
+								}
+								else
+									Log.d(tag, "target didn't set");
+							}
+						});
+			   	    }
 					return false;
 				}
 		    });
@@ -171,6 +194,7 @@ public class GameFragment extends SherlockFragment {
     
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
+		Toast.makeText(getActivity(), "the first avatar you will click it will be your target for this match", Toast.LENGTH_LONG).show();
 	}
 
 	public class ImageAdapter extends BaseAdapter {

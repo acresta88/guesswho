@@ -3,6 +3,7 @@ package it.guesswho.view;
 import it.guesswho.R;
 import it.guesswho.controller.ControllerGCM;
 import it.guesswho.model.GuessWhoApplication;
+import it.guesswho.task.OnResultCallback;
 import it.guesswho.utils.NetworkUtils;
 import android.content.Intent;
 import android.os.Bundle;
@@ -84,22 +85,36 @@ public class GameSendMessageFragment extends SherlockFragment {
 						if(application.getCellUsers().get(i).getName().equals(t))
 						{
 							Log.d(tag, "trying to guess " + application.getCellUsers().get(i).getId());
-							res = NetworkUtils.closeMatch(application.getUser().getId(), application.getOpponent(), application.getCellUsers().get(i).getId());
 							break;
 						}
 					}
+					
 					if(i == application.getCellUsers().size())
 						Toast.makeText(getActivity(), "The inserted name doesn't exist!", Toast.LENGTH_SHORT).show();
 					else
 					{
-						if(res)
-						{
-							Toast.makeText(getActivity(), "YOU WIN!!", Toast.LENGTH_SHORT).show();
-							Intent intent = new Intent(getActivity(), MainActivity.class);
-							startActivity(intent);
-						}
-						else
-							Toast.makeText(getActivity(), "The inserted name is not the correct one!", Toast.LENGTH_SHORT).show();
+						//founded the user, have to ask to the server if is correct 
+						NetworkUtils.closeMatch(application.getUser().getId(), 
+								application.getOpponent(), 
+								application.getCellUsers().get(i).getId(),
+								new OnResultCallback() {
+									
+									@Override
+									public void onTaskCompleted(Object response) {
+										boolean res = (Boolean)response; 
+										if(res)
+										{
+											application.clearImages();
+											application.setCellUsers(null);
+											application.setFriendList(null);
+											Toast.makeText(getActivity(), "YOU WIN!!", Toast.LENGTH_SHORT).show();
+											Intent intent = new Intent(getActivity(), MainActivity.class);
+											startActivity(intent);
+										}
+										else
+											Toast.makeText(getActivity(), "The inserted name is not the correct one!", Toast.LENGTH_SHORT).show();
+									}
+								});
 					}
 				}
 			});

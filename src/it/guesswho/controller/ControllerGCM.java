@@ -3,6 +3,7 @@ package it.guesswho.controller;
 import com.google.android.gcm.GCMRegistrar;
 
 import it.guesswho.model.GuessWhoApplication;
+import it.guesswho.task.OnResultCallback;
 import it.guesswho.utils.NetworkUtils;
 import android.app.Activity;
 import android.util.Log;
@@ -12,13 +13,14 @@ public class ControllerGCM {
 	private GuessWhoApplication application;
 	private Activity activity;
 	private boolean registeredToTheServer;
+	private String tag = "ControllerGCM";
+	
 	public ControllerGCM(Activity a) {
 		this.activity = a;
 		registeredToTheServer = false;
 	}
 
 	public void enableGCM() {
-		String tag = "GCMService";
 		
         /* abilitare GCM */
         GCMRegistrar.checkManifest(activity);
@@ -40,8 +42,13 @@ public class ControllerGCM {
 //        {
         	Log.d(tag, "not registered to the server, regitering now!");
         	try{
-        	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId(), application.getUser().getName());
-        	registeredToTheServer = true;
+        	NetworkUtils.registerToServer(application.getGcmId(), application.getUser().getId(), application.getUser().getName(), new OnResultCallback() {
+				
+				@Override
+				public void onTaskCompleted(Object response) {
+		        	registeredToTheServer = true;					
+				}
+			});
         	} catch(NullPointerException e)
         	{
         		Toast.makeText(activity.getApplicationContext(), "user data incomplete, try to log in again", Toast.LENGTH_SHORT).show();
@@ -55,6 +62,12 @@ public class ControllerGCM {
 	
 	public void sendGCMMessage(String senderId, String receiverId, String message, String answer)
     {
-		NetworkUtils.sendGCMMessage(senderId, receiverId, message, answer);
+		NetworkUtils.sendGCMMessage(senderId, receiverId, message, answer, new OnResultCallback() {
+			
+			@Override
+			public void onTaskCompleted(Object response) {
+				Log.d(tag, "" + response);
+			}
+		});
     }
 }
