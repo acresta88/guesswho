@@ -62,7 +62,7 @@ public class GameSendMessageFragment extends SherlockFragment {
 						t = text.getText().toString();
 					
 					Log.d(tag, "onclick text: " + t);
-					controllore.sendGCMMessage(application.getUser().getId(), application.getUser().getId(), t, "");
+					controllore.sendGCMMessage(application.getUser().getId(), application.getOpponent(), t, "");
 				}
 			});
 			

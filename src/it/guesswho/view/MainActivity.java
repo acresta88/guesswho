@@ -74,9 +74,9 @@ public class MainActivity extends FragmentActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		
 		super.onCreate(null);
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-
-		StrictMode.setThreadPolicy(policy); 
+//		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//
+//		StrictMode.setThreadPolicy(policy); 
 		setContentView(R.layout.activity_main);
 
 		if (NetworkUtils.isConnected(this)) {

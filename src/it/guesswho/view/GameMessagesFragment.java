@@ -165,10 +165,10 @@ public class GameMessagesFragment extends SherlockFragment {
 
 	public void addInList(String message) {
 		if (listMessages == null)
-		{
 			listMessages = new ArrayList<String>();
+		if(	listAnswers == null)
 			listAnswers = new ArrayList<String>();
-		}
+
 		Log.d(tag, "addinlist:" + message + " list " + listMessages);
 		listMessages.add(message);
 		listAnswers.add("");
